@@ -1,0 +1,8 @@
+ ==================================== Hangman Game! ====================================
+ =                                                                                      
+ =         You have to guess letter by letter until you find the hidden word
+ =      
+ =         You only have three attemps, or this poor guy is going to die 
+ =======================================================================================
+
+ 

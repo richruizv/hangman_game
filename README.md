@@ -1,1 +1,2 @@
-"# hangman_game" 
+# Hangman Game
+Hangman game in python

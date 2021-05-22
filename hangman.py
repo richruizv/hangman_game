@@ -1,6 +1,7 @@
 import os
 import platform
 import random as rd
+import sys
 
 
 def clear_os():
@@ -8,6 +9,9 @@ def clear_os():
         os.system('cls')  
     else:
         os.system('clear')  
+
+def hasNumbers(inputString):
+    return any(char.isdigit() for char in inputString)
     
 def read_intro():
     with open("./files/intro.txt", "r", encoding="utf-8") as f:
@@ -24,6 +28,7 @@ def get_random_word():
     random_word = words[rd.randint(0,len(words)-1)]
 
     return random_word
+
 
 def print_hidden_word(word,guessed_letter):
     mask_word = list(word) #we make a mask to print the hidden letters comparing the opposite
@@ -55,36 +60,64 @@ def iterative_find(word,letter,guessed_letter,needle):
     else:
         return False
     
-def print_hangman(attemps_left):
-    with open("./files/hangman1.txt", "r", encoding="utf-8") as f:
-        for line in f:
-            print("                 " + line)
-    print("Attemps left: "+str(attemps_left))    
+def print_hangman(status):
+    if status == 1:
+        print("     YOU WIN!!!")    
+        with open("./files/hangman3.txt", "r", encoding="utf-8") as f:
+            for line in f:
+                print("                 " + line)
+    elif status == 0:
+        with open("./files/hangman1.txt", "r", encoding="utf-8") as f:
+            for line in f:
+                print("                 " + line)
+    elif status == 2:
+        print("                 YOU LOSE!!!")    
+        with open("./files/hangman2.txt", "r", encoding="utf-8") as f:
+            for line in f:
+                print("                 " + line)
+                
     
 def hangman_attemp(word,guessed_letter,attemps_left):
     clear_os()
     read_intro()
-    print_hangman(attemps_left)
-    print_hidden_word(word,guessed_letter)
-
-    letter = input('Guess the word letter by letter: ')
     
-    needle = word
-    attemp = iterative_find(needle,letter,guessed_letter,0)
+    if attemps_left == 0:
+        guessed_letter = [key for key,letter in enumerate(word) ]
+        status = 2 #lose
+    elif len(word) == len(guessed_letter):
+        status = 1 #win  
+    else:
+        status = 0 
 
-    if attemp == False:
-        attemps_left -= 1
+    print_hangman(status)
+    print("Attemps left: "+str(attemps_left))    
+    print_hidden_word(word,guessed_letter)
+    
+    if status == 0:
+        letter = input('Guess the word letter by letter: ')    
+        if len(letter) != 1 or hasNumbers(letter):
+            raise ValueError('You must insert only one alfabet character ')
+        needle = word
+        attemp = iterative_find(needle,letter,guessed_letter,0)
 
-    return attemps_left
+        if attemp == False:
+            attemps_left -= 1
+
+    return attemps_left,status
     
 
 def run():
+    sys.setrecursionlimit(40)
     rand_word = get_random_word()
     guessed_letter = []
+    
     attemps_left = len(rand_word)*2
-
-    while 1:
-        attemps_left = hangman_attemp(rand_word,guessed_letter,attemps_left)
+    status=0
+    try:
+        while status == 0:
+            attemps_left,status = hangman_attemp(rand_word,guessed_letter,attemps_left)
+    except ValueError: 
+        print('You must insert only one alfabet character ')
      
 if __name__ == '__main__':
     run()
